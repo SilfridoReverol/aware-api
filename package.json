@@ -1,0 +1,29 @@
+{
+  "name": "aware-api",
+  "version": "1.0.0",
+  "description": "Aware Server",
+  "main": "index.js",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-validator": "^6.12.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  },
+  "scripts": {
+    "start": "node src/index",
+    "dev": "node src/index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SilfridoReverol/aware-api.git"
+  },
+  "author": "Silfrido Reverol",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SilfridoReverol/aware-api/issues"
+  },
+  "homepage": "https://github.com/SilfridoReverol/aware-api#readme"
+}
