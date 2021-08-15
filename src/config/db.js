@@ -1,7 +1,7 @@
 module.exports = {
   user: 'postgres',
   host: 'localhost',
-  database: 'Aware',
+  database: 'awareDevelopment',
   password: 'asd123',
   port: 5432,
   max: 10,

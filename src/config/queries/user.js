@@ -6,7 +6,7 @@ module.exports = {
 
   getAllUsers: `SELECT * FROM ${table}`,
 
-  getUserById: `SELECT * FROM ${table}  WHERE userId = $1`,
+  getUserById: `SELECT * FROM ${table}  WHERE user_id = $1`,
 
   getUserByEmail: `SELECT * FROM ${table} WHERE email = $1`,
 

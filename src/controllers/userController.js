@@ -16,7 +16,7 @@ const dataToUser = (rows) => {
 
   rows.forEach((element) => {
     users.push({
-      id: element.userid,
+      userid: element.user_id,
       first_name: element.first_name,
       last_name: element.last_name,
       saved_sex: element.sex,
