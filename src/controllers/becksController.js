@@ -3,10 +3,10 @@ const dbConfig = require('../config/db');
 const field = require('../utils/field');
 const dbQueriesBeck = require('../config/queries/becks');
 const dbQueriesUser = require('../config/queries/user');
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
-
+const becksPdfCreator = require('../utils/becksPdf');
+const { sendMail } = require('../utils/mailer');
 const pool = new Pool(dbConfig);
+const path = require('path');
 
 const newReponse = (message, typeResponse, body) => {
   return { message, typeResponse, body };
@@ -150,12 +150,14 @@ const getBecks = async (req, res) => {
 };
 
 const createBecksPdf = async (req, res) => {
-  const { userId } = req.params;
-  const data = await pool.query(dbQueriesBeck.getBeckById, [userId]);
+  const { becksId } = req.params;
+  const data = await pool.query(dbQueriesBeck.getBeckById, [becksId]);
 
   if (data) {
+    // console.log(data);
     const becks = dataToBecks(data.rows);
     const becksData = becks[0];
+    console.log(becksData);
     const userId = becksData.userId;
 
     const user = await pool.query(dbQueriesUser.getUserById, [userId]);
@@ -164,22 +166,8 @@ const createBecksPdf = async (req, res) => {
       const userData = dataToUser(user.rows);
       const becksUser = userData[0];
 
-      var doc = new PDFDocument();
-
-      doc.pipe(
-        fs.createWriteStream(
-          `Beck's ${becksUser.first_name + becksUser.last_name}.pdf`
-        )
-      );
-
-      doc.text(`${becksUser.first_name} ${becksUser.last_name}`, 100, 100);
-
-      doc.text(`${becksData.total_score}`);
-
-      doc.addPage();
-      doc.text('Hello world!', 100, 100);
-
-      doc.end();
+      becksPdfCreator(becksData, becksUser);
+      console.log(becksData.send_date);
 
       res.json(newReponse('a', 'b', dataToUser(user.rows)));
     } else {
@@ -187,6 +175,41 @@ const createBecksPdf = async (req, res) => {
     }
   } else {
     res.send('wrong');
+  }
+};
+
+const sendBecks = async (req, res) => {
+  const { becksId } = req.params;
+  const data = await pool.query(dbQueriesBeck.getBeckById, [becksId]);
+
+  if (data) {
+    const becks = dataToBecks(data.rows);
+    const becksData = becks[0];
+    console.log(becksData);
+    const userId = becksData.userId;
+
+    const user = await pool.query(dbQueriesUser.getUserById, [userId]);
+
+    if (user) {
+      const userData = dataToUser(user.rows);
+      const becksUser = userData[0];
+      sendMail(
+        becksUser.saved_therapistEmail,
+        becksUser.first_name + becksUser.last_name + 'Inventario de Beck',
+        `
+        <p >${becksUser.first_name} ha tomado el inventario de Beck</p>
+        <span style="color: green">Este correo se ha enviado desde una cuenta no monitoreada. Por favor no responder</span>
+      `,
+        [
+          {
+            filename: 'Document.pdf',
+            path: 'C:/Users/silfr/Desktop/aware/aware-api/beck.pdf',
+            contentType: 'application/pdf',
+          },
+        ],
+        () => res.status(200).json('success')
+      );
+    }
   }
 };
 
@@ -200,6 +223,7 @@ const deleteBecks = async (req, res) => {
 };
 
 module.exports = {
+  sendBecks,
   createBeck,
   getBecks,
   createBecksPdf,
